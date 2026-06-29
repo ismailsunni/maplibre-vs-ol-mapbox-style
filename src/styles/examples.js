@@ -60,17 +60,18 @@ const labelLayer = (overrides = {}) => ({
 });
 
 export const examples = [
-  {
-    id: "no-glyphs",
-    title: "Labels with NO glyphs URL",
-    description:
-      "A symbol layer with a text-field, but the style declares no `glyphs` endpoint. " +
-      "MapLibre GL cannot rasterise text without a glyph source, so it renders the dots " +
-      "but NO labels (watch the status box for its error). ol-mapbox-style renders text " +
-      "with the browser's own fonts, so the labels appear. Same style, opposite result — " +
-      "this is the labelling divergence in a nutshell.",
-    style: () => base([dots, labelLayer()]),
-  },
+  // Temporarily hidden — re-enable to show the "labels with NO glyphs URL" case.
+  // {
+  //   id: "no-glyphs",
+  //   title: "Labels with NO glyphs URL",
+  //   description:
+  //     "A symbol layer with a text-field, but the style declares no `glyphs` endpoint. " +
+  //     "MapLibre GL cannot rasterise text without a glyph source, so it renders the dots " +
+  //     "but NO labels (watch the status box for its error). ol-mapbox-style renders text " +
+  //     "with the browser's own fonts, so the labels appear. Same style, opposite result — " +
+  //     "this is the labelling divergence in a nutshell.",
+  //   style: () => base([dots, labelLayer()]),
+  // },
   // Temporarily hidden — re-enable to show the "labels WITH a glyphs URL" case.
   // {
   //   id: "with-glyphs",
