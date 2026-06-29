@@ -83,17 +83,50 @@ h1 {
   cursor: pointer;
 }
 
-.style-json {
+.style-panel {
   margin: 0 0 1rem;
-  padding: 0.6rem 0.8rem;
-  max-height: 360px;
-  overflow: auto;
-  background: #1e1e1e;
-  color: #d6e2d6;
-  font-size: 0.78rem;
-  line-height: 1.4;
+}
+
+.style-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.style-toolbar button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#style-update {
+  font-weight: 600;
+}
+
+.style-error {
+  color: #c1121f;
+  font-size: 0.82rem;
+}
+
+.style-editor {
+  border: 1px solid #ccc;
   border-radius: 4px;
-  white-space: pre;
+  overflow: hidden;
+}
+
+/* CodeMirror sizing: cap the height and let the editor scroll internally. */
+.style-editor .cm-editor {
+  max-height: 360px;
+  font-size: 0.82rem;
+}
+
+.style-editor .cm-scroller {
+  overflow: auto;
+}
+
+.style-editor .cm-editor.cm-focused {
+  outline: none;
 }
 
 main {

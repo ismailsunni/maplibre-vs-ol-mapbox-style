@@ -31,7 +31,15 @@
       </div>
 
       <p id="description" class="description"></p>
-      <pre id="style-json" class="style-json" hidden></pre>
+
+      <section id="style-panel" class="style-panel" hidden>
+        <div class="style-toolbar">
+          <button id="style-update" type="button">Update rendering</button>
+          <button id="style-reset" type="button">Reset</button>
+          <span id="style-error" class="style-error" role="alert"></span>
+        </div>
+        <div id="style-editor" class="style-editor"></div>
+      </section>
     </header>
 
     <main>

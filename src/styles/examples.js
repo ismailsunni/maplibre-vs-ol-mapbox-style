@@ -71,20 +71,21 @@ export const examples = [
       "this is the labelling divergence in a nutshell.",
     style: () => base([dots, labelLayer()]),
   },
-  {
-    id: "with-glyphs",
-    title: "Labels WITH a glyphs URL",
-    description:
-      "The same style, now with MapLibre's demo `glyphs` endpoint and text-font " +
-      "\"Open Sans Regular\". Both renderers now show labels — but compare them: MapLibre " +
-      "uses the downloaded SDF glyphs (Open Sans), while ol-mapbox-style substitutes a " +
-      "local browser font, so typeface, halo and offset rendering differ. (Needs network " +
-      "for the glyph PBFs.)",
-    style: () =>
-      base([dots, labelLayer({ layout: { "text-font": ["Open Sans Regular"] } })], {
-        glyphs: DEMO_GLYPHS,
-      }),
-  },
+  // Temporarily hidden — re-enable to show the "labels WITH a glyphs URL" case.
+  // {
+  //   id: "with-glyphs",
+  //   title: "Labels WITH a glyphs URL",
+  //   description:
+  //     "The same style, now with MapLibre's demo `glyphs` endpoint and text-font " +
+  //     "\"Open Sans Regular\". Both renderers now show labels — but compare them: MapLibre " +
+  //     "uses the downloaded SDF glyphs (Open Sans), while ol-mapbox-style substitutes a " +
+  //     "local browser font, so typeface, halo and offset rendering differ. (Needs network " +
+  //     "for the glyph PBFs.)",
+  //   style: () =>
+  //     base([dots, labelLayer({ layout: { "text-font": ["Open Sans Regular"] } })], {
+  //       glyphs: DEMO_GLYPHS,
+  //     }),
+  // },
   {
     id: "text-background",
     title: "Label background box (icon-text-fit)",

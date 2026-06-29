@@ -4,6 +4,8 @@ import "./style.css";
 
 import maplibregl from "maplibre-gl";
 import { apply } from "ol-mapbox-style";
+import { EditorView, basicSetup } from "codemirror";
+import { json } from "@codemirror/lang-json";
 
 import { examples } from "./styles/examples.js";
 
@@ -12,26 +14,66 @@ const descriptionEl = document.getElementById("description");
 const mlStatusEl = document.getElementById("maplibre-status");
 const olStatusEl = document.getElementById("ol-status");
 const toggleStyleEl = document.getElementById("toggle-style");
-const styleJsonEl = document.getElementById("style-json");
+const stylePanelEl = document.getElementById("style-panel");
+const styleEditorEl = document.getElementById("style-editor");
+const styleUpdateEl = document.getElementById("style-update");
+const styleResetEl = document.getElementById("style-reset");
+const styleErrorEl = document.getElementById("style-error");
 
 // Keep references so we can tear the maps down before rebuilding them.
 let mlMap;
 let olMap;
 
-// The exact style object currently fed to both renderers — shown by the
-// "Show MapLibre style" button so it's clear both get identical input.
-let currentStyle;
+// The pristine style for the currently selected example, kept so "Reset" can
+// undo any edits the user made in the editor.
+let pristineStyle;
 
-function syncStyleViewer() {
-  styleJsonEl.textContent = currentStyle
-    ? JSON.stringify(currentStyle, null, 2)
-    : "";
+// --- Editable style editor (CodeMirror) ------------------------------------
+// basicSetup brings line numbers, a fold gutter (expand/shrink), bracket
+// matching, history and JSON syntax highlighting via json().
+const editor = new EditorView({
+  doc: "",
+  extensions: [basicSetup, json()],
+  parent: styleEditorEl,
+});
+
+function setEditorDoc(text) {
+  editor.dispatch({
+    changes: { from: 0, to: editor.state.doc.length, insert: text },
+  });
+}
+
+function styleError(message) {
+  styleErrorEl.textContent = message ?? "";
 }
 
 toggleStyleEl.addEventListener("click", () => {
-  const hidden = styleJsonEl.hidden;
-  styleJsonEl.hidden = !hidden;
+  const hidden = stylePanelEl.hidden;
+  stylePanelEl.hidden = !hidden;
   toggleStyleEl.textContent = hidden ? "Hide MapLibre style" : "Show MapLibre style";
+  // CodeMirror can't measure itself while its container is display:none, so
+  // re-measure once it becomes visible.
+  if (hidden) editor.requestMeasure();
+});
+
+// "Update rendering": re-render both maps from the edited JSON.
+styleUpdateEl.addEventListener("click", () => {
+  let parsed;
+  try {
+    parsed = JSON.parse(editor.state.doc.toString());
+  } catch (err) {
+    styleError("Invalid JSON: " + (err?.message ?? err));
+    return;
+  }
+  styleError("");
+  renderStyle(parsed);
+});
+
+// "Reset": restore the selected example's original style.
+styleResetEl.addEventListener("click", () => {
+  styleError("");
+  setEditorDoc(JSON.stringify(pristineStyle, null, 2));
+  renderStyle(pristineStyle);
 });
 
 function status(el, lines) {
@@ -50,15 +92,20 @@ function destroyMaps() {
   }
 }
 
-async function render(example) {
-  destroyMaps();
+// Load an example: stash its pristine style, fill the editor, and render.
+function loadExample(example) {
   descriptionEl.textContent = example.description;
-
+  styleError("");
   // IMPORTANT: build the style ONCE and feed the very same object to both
   // renderers, so any difference is purely the renderer, not the input.
-  const style = example.style();
-  currentStyle = style;
-  syncStyleViewer();
+  pristineStyle = example.style();
+  setEditorDoc(JSON.stringify(pristineStyle, null, 2));
+  renderStyle(pristineStyle);
+}
+
+// Render a (possibly user-edited) style object into both maps.
+async function renderStyle(style) {
+  destroyMaps();
 
   // --- MapLibre GL JS (native) ---------------------------------------------
   status(mlStatusEl, ["loading…"]);
@@ -115,7 +162,7 @@ async function render(example) {
 }
 
 function describeLayers(style) {
-  const types = style.layers
+  const types = (style.layers ?? [])
     .filter((l) => l.type !== "background")
     .map((l) => l.type);
   return `${types.length} layer(s): ${types.join(", ")}`;
@@ -137,9 +184,9 @@ for (const example of examples) {
 selectEl.addEventListener("change", () => {
   const example = examples.find((e) => e.id === selectEl.value);
   if (example) {
-    render(example);
+    loadExample(example);
   }
 });
 
 // First paint.
-render(examples[0]);
+loadExample(examples[0]);

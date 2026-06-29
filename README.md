@@ -69,6 +69,11 @@ background box at all.
 same object to both `new maplibregl.Map({ style })` and `apply('ol', style)`. No
 per-renderer tweaking — any difference you see is the renderer, not the input.
 
+**Show MapLibre style** opens an editable JSON editor (CodeMirror — line numbers,
+folding, syntax highlight). Tweak the style and hit **Update rendering** to re-render
+both maps from your edits, or **Reset** to restore the example. The same edited object
+goes to both renderers, so it stays an apples-to-apples comparison.
+
 ## Versions
 
 Pinned to match the SWISSGEO portal: `ol@^10.9.0`, `ol-mapbox-style@^13.4.1`,

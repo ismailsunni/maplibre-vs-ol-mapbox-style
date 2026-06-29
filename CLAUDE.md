@@ -50,6 +50,10 @@ drift apart by tweaking the style per-renderer.
 - **Keep it dependency-light and framework-free.** Vanilla JS + Vite only. Don't
   add a UI framework, a state library, or a basemap/tile provider — examples should
   stay self-contained (inline GeoJSON, no API keys) wherever possible.
+  - **Exception:** CodeMirror 6 (`codemirror`, `@codemirror/lang-json`) powers the
+    editable style panel (line numbers, JSON folding/expand-shrink, syntax
+    highlight). It's dev tooling for inspecting/editing the shared style, not part
+    of the examples — keep that boundary.
 - Coordinates in `data.js` and style `center` are **[lng, lat]** (EPSG:4326), which
   both renderers expect for a `geojson` source.
 - When adding an example that needs the network (e.g. a `glyphs` PBF endpoint), say
