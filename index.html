@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MapLibre GL vs OpenLayers (ol-mapbox-style)</title>
+  </head>
+  <body>
+    <header>
+      <div class="titlebar">
+        <h1>Same MapLibre style, two renderers</h1>
+        <a
+          class="repo-link"
+          href="https://github.com/ismailsunni/maplibre-vs-ol-mapbox-style"
+          target="_blank"
+          rel="noopener"
+          >View on GitHub ↗</a
+        >
+      </div>
+      <p class="lede">
+        The <strong>identical</strong> MapLibre GL style object is handed to
+        <strong>MapLibre GL JS</strong> (left) and to
+        <strong>OpenLayers + ol-mapbox-style</strong> (right). Pick an example to
+        see where the two renderers disagree.
+      </p>
+
+      <div class="controls">
+        <label for="example">Example:</label>
+        <select id="example"></select>
+        <button id="toggle-style" type="button">Show MapLibre style</button>
+      </div>
+
+      <p id="description" class="description"></p>
+      <pre id="style-json" class="style-json" hidden></pre>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>
+          MapLibre GL JS <span class="tag tag-ml">native</span>
+          <span class="ver" id="ml-ver"></span>
+        </h2>
+        <div id="maplibre" class="map"></div>
+        <pre id="maplibre-status" class="status"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>
+          OpenLayers <span class="tag tag-ol">ol-mapbox-style</span>
+          <span class="ver" id="ol-ver"></span>
+        </h2>
+        <div id="ol" class="map"></div>
+        <pre id="ol-status" class="status"></pre>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
