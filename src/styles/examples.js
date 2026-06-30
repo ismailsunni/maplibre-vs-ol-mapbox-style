@@ -102,14 +102,14 @@ export const examples = [
     description:
       "Filled box behind each label, fitted to the text in BOTH renderers — but via " +
       "different mechanisms, because there's no single style property for it. MapLibre: a " +
-      "rounded `icon-image` from an external `sprite`, stretched with `icon-text-fit: " +
+      "rectangular `icon-image` from an external `sprite`, stretched with `icon-text-fit: " +
       "\"both\"` (pure style). OpenLayers: ol-mapbox-style honours neither `icon-text-fit` " +
       "nor a text background, so a small generic app step (src/olTextBackground.js) reads " +
       "`metadata[\"ol:text-background\"]` off the layer and applies OpenLayers' native Text " +
       "`backgroundFill` after apply() — driven entirely by the style, working for any " +
       "layer. That post-apply step is the recipe for label backgrounds in the SWISSGEO " +
-      "portal. (MapLibre corners are rounded; OL's box is rectangular. Needs network for " +
-      "the demo `glyphs` PBFs.)",
+      "portal. (Both boxes are rectangular, to match. Needs network for the demo " +
+      "`glyphs` PBFs.)",
     style: () =>
       base(
         [
@@ -138,7 +138,7 @@ export const examples = [
               "text-offset": [0, -0.6],
               "text-allow-overlap": true,
               "icon-allow-overlap": true,
-              // The rounded blue box from the sprite, stretched to the text by
+              // The blue box from the sprite, stretched to the text by
               // icon-text-fit (MapLibre only — ol-mapbox-style ignores the fit).
               "icon-image": "label-bg",
               "icon-text-fit": "both",

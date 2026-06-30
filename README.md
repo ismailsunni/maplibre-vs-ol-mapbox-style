@@ -62,9 +62,9 @@ single style property that draws a filled box behind a label in *both* renderers
 renderer gets the box its own way:
 
 - **MapLibre GL**: the maintainer-recommended trick — a background `icon-image` stretched
-  to the text with `icon-text-fit: "both"`. The box is a rounded, coloured **9-slice
-  sprite** in `public/`, supplied purely via the style's `sprite` URL (regenerate/recolour
-  with `node scripts/gen-sprite.cjs public`).
+  to the text with `icon-text-fit: "both"`. The box is a coloured **9-slice
+  sprite** in `public/` (square corners, to match OpenLayers), supplied purely via the
+  style's `sprite` URL (regenerate/recolour with `node scripts/gen-sprite.cjs public`).
 - **OpenLayers**: a small **generic, style-driven** step (`src/olTextBackground.js`) run
   after `apply()`. A symbol layer opts in via `metadata["ol:text-background"]` (fill /
   stroke / padding), and the helper applies OpenLayers' **native** `Text` `backgroundFill`
@@ -72,8 +72,8 @@ renderer gets the box its own way:
   **the recipe for label backgrounds in the SWISSGEO portal** (where OpenLayers is the
   renderer and the style file alone can't express this).
 
-(MapLibre's corners are rounded; OpenLayers' box is rectangular — OL has no border radius
-on text backgrounds.)
+(Both boxes are rectangular: OpenLayers' `backgroundFill` has no border radius, so the
+MapLibre sprite uses square corners too, to match.)
 
 ## How it's wired
 

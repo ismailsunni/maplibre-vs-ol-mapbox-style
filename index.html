@@ -62,6 +62,87 @@
       </section>
     </main>
 
+    <section class="notes">
+      <h2>Reference: how the label background is done in each renderer</h2>
+      <p>
+        The Mapbox/MapLibre style spec has <strong>no</strong>
+        <code>text-background</code> property, so a filled box behind a label is
+        achieved differently in each renderer. The boxes above look the same, but the
+        two paths are not — recorded here for the future migration to native MapLibre.
+      </p>
+
+      <div class="notes-table-wrap">
+        <table class="notes-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Native MapLibre GL JS</th>
+              <th>OpenLayers + ol-mapbox-style</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Box mechanism</th>
+              <td><code>icon-image</code> + <code>icon-text-fit: "both"</code></td>
+              <td>OpenLayers' native <code>Text.backgroundFill</code></td>
+            </tr>
+            <tr>
+              <th>Where the box comes from</th>
+              <td>a <code>sprite</code> image, referenced by the style's <code>sprite</code> URL</td>
+              <td><code>metadata["ol:text-background"]</code>, read by a post-<code>apply()</code> helper</td>
+            </tr>
+            <tr>
+              <th>Extra app code?</th>
+              <td><strong>None</strong> — pure style (spec-native)</td>
+              <td><strong>Yes</strong> — a small <code>setStyle</code> override after <code>apply()</code></td>
+            </tr>
+            <tr>
+              <th>Box colour source</th>
+              <td>the sprite PNG's pixels</td>
+              <td>the <code>metadata</code> fill</td>
+            </tr>
+            <tr>
+              <th>Corner shape</th>
+              <td>rectangle (square sprite)</td>
+              <td>rectangle (no border radius)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>To reproduce this styling</h3>
+      <ul>
+        <li>
+          <strong>Native MapLibre</strong> — the clean, maintainer-recommended way
+          (<a
+            href="https://github.com/mapbox/mapbox-gl-js/issues/5381"
+            target="_blank"
+            rel="noopener"
+            >mapbox-gl-js #5381</a
+          >): add a <code>sprite</code> to the style with a 9-slice box icon, then on the
+          <code>symbol</code> layer set <code>icon-image</code>,
+          <code>icon-text-fit: "both"</code> and <code>icon-text-fit-padding</code>. No
+          JavaScript — the box colour lives in the sprite image.
+        </li>
+        <li>
+          <strong>ol-mapbox-style</strong> — it implements neither
+          <code>icon-text-fit</code> nor a text background, so after
+          <code>apply()</code> / <code>stylefunction()</code> wrap the layer's style
+          function and set <code>backgroundFill</code> / <code>backgroundStroke</code> /
+          <code>padding</code> on each <code>Text</code> style, reading the colour and
+          padding from <code>metadata["ol:text-background"]</code>.
+        </li>
+      </ul>
+
+      <p class="notes-takeaway">
+        <strong>For the migration to native MapLibre:</strong> the OpenLayers
+        <code>backgroundFill</code> workaround is no longer needed — the
+        <code>icon-image</code> + <code>icon-text-fit</code> + <code>sprite</code>
+        approach is spec-native and requires <em>no</em> hacky renderer code. The
+        workaround lives in OpenLayers, not in MapLibre.
+      </p>
+    </section>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

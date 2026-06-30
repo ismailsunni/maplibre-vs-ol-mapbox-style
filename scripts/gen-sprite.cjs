@@ -2,7 +2,8 @@
 //
 //   node scripts/gen-sprite.cjs public
 //
-// Emits a 1-icon sprite ("label-bg") as a rounded, colored rectangle plus its
+// Emits a 1-icon sprite ("label-bg") as a colored rectangle (square corners by
+// default, to match OpenLayers' Text backgroundFill; set RADIUS > 0 to round) plus its
 // @2x variant, with 9-slice metadata (stretchX/stretchY/content) so MapLibre's
 // icon-text-fit stretches only the middle and the rounded corners stay crisp.
 // There is no style property for a label background colour — recolour here.
@@ -19,7 +20,9 @@ const outDir = process.argv[2] || "public";
 // ch.bafu.hydroweb-* / ch.meteoschweiz.* label style. Fill only, no border.
 const FILL = { r: 14, g: 80, b: 114, a: 0.9 };
 const SIZE = 20; // @1x icon size in px
-const RADIUS = 5; // @1x corner radius in px
+// Square corners (radius 0) to match OpenLayers' Text backgroundFill, which is a
+// plain rectangle with no border radius. Bump this for rounded corners.
+const RADIUS = 0; // @1x corner radius in px
 
 function crc32(buf) {
   let c = ~0;

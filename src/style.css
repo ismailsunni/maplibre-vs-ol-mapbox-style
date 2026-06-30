@@ -189,3 +189,66 @@ main {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.notes {
+  max-width: 1200px;
+  margin: 1.5rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid #ddd;
+  color: #333;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.notes h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+
+.notes h3 {
+  font-size: 0.95rem;
+  margin: 1.1rem 0 0.4rem;
+}
+
+.notes code {
+  background: #eef1f4;
+  padding: 0.05rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+.notes-table-wrap {
+  overflow-x: auto;
+}
+
+.notes-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 640px;
+  margin: 0.5rem 0;
+}
+
+.notes-table th,
+.notes-table td {
+  border: 1px solid #ddd;
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.notes-table thead th {
+  background: #f4f6f8;
+}
+
+.notes-table tbody th {
+  background: #fafbfc;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.notes-takeaway {
+  background: #f4f6f8;
+  border-left: 3px solid var(--tag-ml);
+  padding: 0.6rem 0.8rem;
+  margin-top: 1.1rem;
+}

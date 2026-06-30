@@ -74,8 +74,8 @@ drift apart by tweaking the style per-renderer.
 - **Label background box — different mechanism per renderer.** The spec has no
   `text-background-*` paint, and ol-mapbox-style honours neither `icon-text-fit` nor a text
   background, so the box is produced two ways:
-  - **MapLibre**: `icon-image` + `icon-text-fit: "both"`, where the image is a rounded,
-    coloured **9-slice sprite** in `public/` (`sprite.{json,png}` + `@2x`), supplied via the
+  - **MapLibre**: `icon-image` + `icon-text-fit: "both"`, where the image is a coloured
+    **9-slice sprite** in `public/` (`sprite.{json,png}` + `@2x`, square corners), supplied via the
     style's `sprite` URL. Regenerate/recolour with `node scripts/gen-sprite.cjs public` —
     there is no style property for the box colour.
   - **OpenLayers**: a real fitted box via OL's native `Text` `backgroundFill`, applied by
@@ -84,6 +84,7 @@ drift apart by tweaking the style per-renderer.
     MapLibre icon box) — and generic across layers. This is the portal recipe.
   - Keep the two colours in sync by hand (sprite `FILL` in `scripts/gen-sprite.cjs` vs the
     `metadata` fill); the sprite colour is baked into the PNG and can't be read at runtime.
-    MapLibre corners are rounded; OL's box is rectangular (OL has no radius).
+    Both boxes are rectangular — OL's `backgroundFill` has no radius, so the sprite uses
+    square corners (`RADIUS = 0` in `gen-sprite.cjs`) to match.
 - Always tear down the previous maps before rebuilding (`map.remove()` for MapLibre,
   `map.setTarget(undefined)` for OL) when switching examples, or containers leak.
