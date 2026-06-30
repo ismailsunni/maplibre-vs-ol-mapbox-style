@@ -1,0 +1,27 @@
+{
+  "label-bg": {
+    "width": 20,
+    "height": 20,
+    "x": 0,
+    "y": 0,
+    "pixelRatio": 1,
+    "stretchX": [
+      [
+        5,
+        15
+      ]
+    ],
+    "stretchY": [
+      [
+        5,
+        15
+      ]
+    ],
+    "content": [
+      5,
+      5,
+      15,
+      15
+    ]
+  }
+}

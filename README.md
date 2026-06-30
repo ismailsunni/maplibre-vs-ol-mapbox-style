@@ -36,7 +36,7 @@ Then open the printed `http://localhost:5173` URL and switch between the example
 |---|---|---|
 | **Labels with NO glyphs URL** | Dots only — **no labels** (errors: it needs a glyph source) | Dots **and** labels (uses the browser's fonts) |
 | **Labels WITH a glyphs URL** | Labels via downloaded SDF glyphs (Open Sans) | Labels via a substituted local font — typeface/halo/offset differ |
-| **Label background box (`icon-text-fit`)** | Filled box behind each label (icon stretched to the text) | Labels with **no background** — `icon-text-fit` is parsed but not applied |
+| **Label background box** | Rounded box behind each label (external sprite stretched to the text via `icon-text-fit`) | Fitted box via OpenLayers' native `Text` `backgroundFill`, applied after `apply()` (driven by layer `metadata`) |
 | **Dots only (control)** | Identical | Identical |
 
 ### The headline difference: `glyphs`
@@ -54,14 +54,26 @@ So the *same* style produces **labels in one renderer and nothing in the other**
 which is the kind of mismatch you hit when validating a converted style against a
 native MapLibre preview.
 
-### The other difference: `icon-text-fit` (label backgrounds)
+### The other difference: label background boxes
 
-The Mapbox/MapLibre spec has **no `text-background-*` paint property**. The
-standard way to draw a filled box behind a label is an `icon-image` stretched to
-the text with `icon-text-fit: "both"`. MapLibre GL applies it; `ol-mapbox-style`
-parses `icon-text-fit` in its embedded spec but has **no code that applies it**
-(and never sets OpenLayers' `Text` `backgroundFill`), so labels render with no
-background box at all.
+The Mapbox/MapLibre spec has **no `text-background-*` paint property**, and there's no
+single style property that draws a filled box behind a label in *both* renderers —
+`ol-mapbox-style` honours **neither** `icon-text-fit` **nor** a text background. So each
+renderer gets the box its own way:
+
+- **MapLibre GL**: the maintainer-recommended trick — a background `icon-image` stretched
+  to the text with `icon-text-fit: "both"`. The box is a rounded, coloured **9-slice
+  sprite** in `public/`, supplied purely via the style's `sprite` URL (regenerate/recolour
+  with `node scripts/gen-sprite.cjs public`).
+- **OpenLayers**: a small **generic, style-driven** step (`src/olTextBackground.js`) run
+  after `apply()`. A symbol layer opts in via `metadata["ol:text-background"]` (fill /
+  stroke / padding), and the helper applies OpenLayers' **native** `Text` `backgroundFill`
+  to that layer — producing a properly *fitted* box. It works for any layer/style and is
+  **the recipe for label backgrounds in the SWISSGEO portal** (where OpenLayers is the
+  renderer and the style file alone can't express this).
+
+(MapLibre's corners are rounded; OpenLayers' box is rectangular — OL has no border radius
+on text backgrounds.)
 
 ## How it's wired
 

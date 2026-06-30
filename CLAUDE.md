@@ -42,6 +42,11 @@ drift apart by tweaking the style per-renderer.
   input. Also wires the example picker and the per-map status boxes (the MapLibre
   `error` event is surfaced there — that's how the "no glyphs" case shows its
   failure).
+- `src/olTextBackground.js` — generic, style-driven post-`apply()` step that gives
+  symbol layers a real fitted label box on the OpenLayers side (OL's native `Text`
+  `backgroundFill`), which ol-mapbox-style can't produce. Opt in per layer via
+  `metadata["ol:text-background"]` in the GL style. `main.js` calls it after every
+  `apply()`. This is the portal-side recipe; keep it generic (no per-example logic).
 - `src/data.js` — inline GeoJSON (Swiss cities) used as the `geojson` source.
 - `index.html` / `src/style.css` — two-panel layout.
 
@@ -66,11 +71,19 @@ drift apart by tweaking the style per-renderer.
 - **`glyphs`**: MapLibre GL renders **no** `text-field` without a `glyphs` URL in the
   style; ol-mapbox-style ignores `glyphs` and uses browser fonts. This asymmetry is
   the main thing the harness demonstrates — preserve it, don't "fix" it.
-- **`icon-text-fit` (label background box)**: the style spec has no `text-background-*`
-  paint, so a filled box behind a label is an `icon-image` stretched to the text with
-  `icon-text-fit: "both"`. MapLibre applies it (the `label-bg` image is registered via
-  `styleimagemissing` in `main.js`); ol-mapbox-style parses `icon-text-fit` in its spec
-  but has **no** code that applies it, so it draws the labels with no background. Another
-  asymmetry to preserve, not "fix".
+- **Label background box — different mechanism per renderer.** The spec has no
+  `text-background-*` paint, and ol-mapbox-style honours neither `icon-text-fit` nor a text
+  background, so the box is produced two ways:
+  - **MapLibre**: `icon-image` + `icon-text-fit: "both"`, where the image is a rounded,
+    coloured **9-slice sprite** in `public/` (`sprite.{json,png}` + `@2x`), supplied via the
+    style's `sprite` URL. Regenerate/recolour with `node scripts/gen-sprite.cjs public` —
+    there is no style property for the box colour.
+  - **OpenLayers**: a real fitted box via OL's native `Text` `backgroundFill`, applied by
+    `src/olTextBackground.js` after `apply()`. It's **style-driven** — the layer opts in
+    with `metadata["ol:text-background"]` (fill/stroke/padding, and `hideIcon` to drop the
+    MapLibre icon box) — and generic across layers. This is the portal recipe.
+  - Keep the two colours in sync by hand (sprite `FILL` in `scripts/gen-sprite.cjs` vs the
+    `metadata` fill); the sprite colour is baked into the PNG and can't be read at runtime.
+    MapLibre corners are rounded; OL's box is rectangular (OL has no radius).
 - Always tear down the previous maps before rebuilding (`map.remove()` for MapLibre,
   `map.setTarget(undefined)` for OL) when switching examples, or containers leak.

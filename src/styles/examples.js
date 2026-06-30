@@ -9,6 +9,15 @@ const ZOOM = 6.6;
 // the differences these examples surface.
 const DEMO_GLYPHS = "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf";
 
+// A self-contained sprite (public/sprite.*) holding a single white box icon,
+// used as a label background via icon-text-fit. MapLibre requires the sprite URL
+// to be absolute, so resolve BASE_URL (dev "/", Pages "/<repo>/") against the
+// current origin. Both renderers load it; only MapLibre stretches it to the text.
+const SPRITE = new URL(
+  import.meta.env.BASE_URL + "sprite",
+  window.location.origin,
+).href;
+
 const base = (layers, extra = {}) => ({
   version: 8,
   center: CENTER,
@@ -89,17 +98,18 @@ export const examples = [
   // },
   {
     id: "text-background",
-    title: "Label background box (icon-text-fit)",
+    title: "Label background box",
     description:
-      "The Mapbox/MapLibre spec has no `text-background-*` paint property — the way to " +
-      "draw a filled box behind a label is an `icon-image` sized to the text with " +
-      "`icon-text-fit: \"both\"` (+ `icon-text-fit-padding`). Here the background image " +
-      "is registered on the MapLibre map (see `styleimagemissing` in main.js), so MapLibre " +
-      "stretches it to wrap each label. ol-mapbox-style parses `icon-text-fit` in its spec " +
-      "but has NO code that applies it (and never sets OpenLayers' Text `backgroundFill`), " +
-      "so the labels appear with no background box at all — the divergence we hit in the " +
-      "portal. (Uses the demo `glyphs` endpoint so MapLibre can rasterise the text the box " +
-      "wraps — needs network.)",
+      "Filled box behind each label, fitted to the text in BOTH renderers — but via " +
+      "different mechanisms, because there's no single style property for it. MapLibre: a " +
+      "rounded `icon-image` from an external `sprite`, stretched with `icon-text-fit: " +
+      "\"both\"` (pure style). OpenLayers: ol-mapbox-style honours neither `icon-text-fit` " +
+      "nor a text background, so a small generic app step (src/olTextBackground.js) reads " +
+      "`metadata[\"ol:text-background\"]` off the layer and applies OpenLayers' native Text " +
+      "`backgroundFill` after apply() — driven entirely by the style, working for any " +
+      "layer. That post-apply step is the recipe for label backgrounds in the SWISSGEO " +
+      "portal. (MapLibre corners are rounded; OL's box is rectangular. Needs network for " +
+      "the demo `glyphs` PBFs.)",
     style: () =>
       base(
         [
@@ -108,26 +118,38 @@ export const examples = [
             id: "city-label-bg",
             type: "symbol",
             source: "cities",
+            // Read by the OpenLayers side (see src/olTextBackground.js): ol-mapbox-style
+            // can't draw a fitted label box, so this declares one for OL to apply
+            // natively after apply(). MapLibre ignores `metadata` and uses the sprite.
+            metadata: {
+              "ol:text-background": {
+                // Real geoadmin label background (fill only, no border).
+                fill: "rgba(14, 80, 114, 0.9)",
+                padding: [3, 6, 3, 6],
+                hideIcon: true,
+              },
+            },
             layout: {
               "text-field": ["get", "name"],
               "text-font": ["Open Sans Regular"],
               "text-size": 15,
-              "text-anchor": "top",
-              "text-offset": [0, 0.8],
+              // Sit the label (and its box) above the point.
+              "text-anchor": "bottom",
+              "text-offset": [0, -0.6],
               "text-allow-overlap": true,
               "icon-allow-overlap": true,
-              // "label-bg" is provided to MapLibre via the styleimagemissing
-              // handler in main.js; ol-mapbox-style ignores icon-text-fit entirely.
+              // The rounded blue box from the sprite, stretched to the text by
+              // icon-text-fit (MapLibre only — ol-mapbox-style ignores the fit).
               "icon-image": "label-bg",
               "icon-text-fit": "both",
               "icon-text-fit-padding": [3, 6, 3, 6],
             },
             paint: {
-              "text-color": "#1d3557",
+              "text-color": "#ffffff",
             },
           },
         ],
-        { glyphs: DEMO_GLYPHS },
+        { glyphs: DEMO_GLYPHS, sprite: SPRITE },
       ),
   },
   {

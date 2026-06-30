@@ -8,6 +8,7 @@ import { EditorView, basicSetup } from "codemirror";
 import { json } from "@codemirror/lang-json";
 
 import { examples } from "./styles/examples.js";
+import { applyOlTextBackgrounds } from "./olTextBackground.js";
 
 const selectEl = document.getElementById("example");
 const descriptionEl = document.getElementById("description");
@@ -117,23 +118,6 @@ async function renderStyle(style) {
       zoom: style.zoom,
       attributionControl: false,
     });
-    // The "text-background" example references icon-image "label-bg" so MapLibre
-    // can size a filled box to each label via icon-text-fit. The spec has no
-    // text-background paint, so we supply a tiny solid image here and let MapLibre
-    // stretch it. ol-mapbox-style has no icon-text-fit support, so it can't.
-    mlMap.on("styleimagemissing", (e) => {
-      if (e.id !== "label-bg" || mlMap.hasImage(e.id)) return;
-      const w = 8;
-      const h = 8;
-      const data = new Uint8ClampedArray(w * h * 4);
-      for (let i = 0; i < w * h; i++) {
-        data[i * 4 + 0] = 255; // R  #ffe28a, slightly translucent
-        data[i * 4 + 1] = 226; // G
-        data[i * 4 + 2] = 138; // B
-        data[i * 4 + 3] = 235; // A
-      }
-      mlMap.addImage(e.id, { width: w, height: h, data });
-    });
     const errors = [];
     mlMap.on("error", (e) => {
       // The "no glyphs" example trips this: MapLibre needs a glyph source to
@@ -155,6 +139,10 @@ async function renderStyle(style) {
   try {
     // apply() builds an OL Map from the gl style (sources + layers + view).
     olMap = await apply("ol", style);
+    // Generic, style-driven step: give symbol layers that declare
+    // metadata["ol:text-background"] a real fitted label box (OpenLayers' native
+    // Text backgroundFill), which ol-mapbox-style itself can't produce.
+    applyOlTextBackgrounds(olMap, style);
     status(olStatusEl, ["✓ loaded — " + describeLayers(style)]);
   } catch (err) {
     status(olStatusEl, ["✗ failed: " + (err?.message ?? err)]);
